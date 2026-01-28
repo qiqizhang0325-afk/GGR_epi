@@ -1,0 +1,10 @@
+arb_ld_vcf_out/
+logs/
+checkpoints/
+embeddings/
+sequences/
+*.pkl
+*.log
+
+# Large reference data
+/data/genome/
