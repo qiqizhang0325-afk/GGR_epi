@@ -210,7 +210,7 @@ ensure_reference_aliases_for_chr() {
   local ref_root="${OUTDIR}/ref_gene_embeddings.${chr}.pkl"
   local int_root="${OUTDIR}/intergenic_embeddings.${chr}.pkl"
 
-  # If only root exists, copy into per-chr
+  # If reference outputs exist in OUTDIR root, copy them into per-chr dir
   if [[ ! -s "${ref_chr}" && -s "${ref_root}" ]]; then
     cp -f "${ref_root}" "${ref_chr}"
   fi
@@ -218,8 +218,8 @@ ensure_reference_aliases_for_chr() {
     cp -f "${int_root}" "${int_chr}"
   fi
 
-  # Create "no-suffix" aliases used by wait/sample
-  # Create "no-suffix" aliases used by wait/sample (fallback to copy if symlink fails)
+  # Create no-suffix aliases (used by wait/sample)
+  # Try symlink first; if it fails, fallback to copy
   if [[ -s "${ref_chr}" ]]; then
     ln -sf "ref_gene_embeddings.${chr}.pkl" "${chrdir}/ref_gene_embeddings.pkl" 2>/dev/null || true
     if [[ ! -s "${chrdir}/ref_gene_embeddings.pkl" ]]; then
@@ -233,7 +233,7 @@ ensure_reference_aliases_for_chr() {
       cp -f "${int_chr}" "${chrdir}/intergenic_embeddings.pkl"
     fi
   fi
-
+}
 
 # ---------- reference file stability check ----------
 # We consider a reference file "stable" if:
@@ -283,16 +283,17 @@ _is_stable() {
 ref_ready_for_chr() {
   local chr="$1"
 
-  # Always normalize reference outputs into OUTDIR/ChrX/
+  # Always normalize / alias first
   ensure_reference_aliases_for_chr "$chr"
 
   local chrdir="${OUTDIR}/${chr}"
+
   local f1a="${chrdir}/ref_gene_embeddings.pkl"
   local f2a="${chrdir}/intergenic_embeddings.pkl"
   local f1b="${chrdir}/ref_gene_embeddings.${chr}.pkl"
   local f2b="${chrdir}/intergenic_embeddings.${chr}.pkl"
 
-  # prefer alias, fallback to suffixed
+  # Prefer no-suffix alias; fallback to suffixed files
   local f1="$f1a"; [[ -e "$f1" ]] || f1="$f1b"
   local f2="$f2a"; [[ -e "$f2" ]] || f2="$f2b"
 
