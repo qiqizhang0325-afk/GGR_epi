@@ -1,0 +1,17 @@
+services:
+  ggr-epi:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    volumes:
+      - ..:/workspace
+    working_dir: /workspace
+    command: >
+      bash scripts/run_pipeline.sh all
+      --fasta data/genome/TAIR10_chr1_all.fas
+      --vcf data/genome/test_template.vcf
+      --gff data/genome/TAIR10_GFF3_genes_chr1.gff
+      --samples data/pheno/samples_test.txt
+      --outdir outputs_test
+      --chrs Chr1
+      --gpus 0
