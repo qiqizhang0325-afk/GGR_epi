@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+export PYTHONPATH="$REPO_ROOT/src:$REPO_ROOT:${PYTHONPATH:-}"
+
 set -euo pipefail
 
 PYMOD="plantcad2.pipeline"
@@ -77,7 +81,7 @@ if [[ -z "$FASTA" || -z "$VCF" || -z "$GFF" || -z "$OUTDIR" || -z "$CHRS" || -z 
   exit 1
 fi
 
-python -c "import {PYMOD}" >/dev/null 2>&1 || { echo "Cannot import module: $PYMOD (did you install the package / set PYTHONPATH?)"; exit 1; }
+python -c "import importlib; importlib.import_module('${PYMOD}')" >/dev/null 2>&1 || { echo "Cannot import module: $PYMOD (did you install the package / set PYTHONPATH?)"; exit 1; }
 
 mkdir -p "$LOGDIR"
 CHRS_ARR=($(echo "$CHRS" | tr ',' ' '))
@@ -211,6 +215,7 @@ run_reference_foreground() {
   done
   echo "[ref] Reference finished."
 }
+
 
 run_reference_background() {
   local gpu="$1"
