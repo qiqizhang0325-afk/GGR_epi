@@ -45,8 +45,13 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-GPU environment with CUDA is recommended.
+This pipeline REQUIRES an NVIDIA GPU with CUDA.
+CPU-only environments are NOT supported.
 
+```bash
+nvidia-smi
+python -c "import torch; print(torch.cuda.is_available(), torch.version.cuda)"
+```
 
 ## Input Files
 You need the following inputs:
@@ -224,3 +229,15 @@ arb_ld_vcf_out/
 ├── Chr4/
 └── Chr5/
 ```
+## Quick Demo (Chr1, tiny sample set)
+
+```bash
+bash run_pipeline.sh all \
+  --fasta data/genome/TAIR10_chr1_all.fas \
+  --vcf   data/genome/test_template.vcf \
+  --gff   data/genome/TAIR10_GFF3_genes_chr1.gff \
+  --outdir outputs_demo \
+  --chrs Chr1 \
+  --gpus 0 \
+  --samples data/pheno/samples_test.txt \
+  --per_chr_outdir 1
